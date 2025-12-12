@@ -14,7 +14,7 @@ async fn main() -> std::io::Result<()> {
             .configure(infrastructure::configure)
             .configure(presentation::configure)
     })
-    .bind("localhost:8000")?
+    .bind("0.0.0.0:8000")?
     .run()
     .await
 }
