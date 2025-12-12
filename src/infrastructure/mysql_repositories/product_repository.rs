@@ -19,7 +19,7 @@ struct ProductModel {
     pub name: String,
     pub price: u64,
     pub stock: u32,
-    pub flags: String,
+    pub flags: Option<String>,
     pub img_url: Option<String>,
     pub description: Option<String>,
     pub created_at: DateTime<Utc>,
@@ -33,7 +33,10 @@ impl Into<Product> for ProductModel {
             self.name,
             (self.price as f64) / 100.0,
             self.stock,
-            self.flags.split(',').map(|s| s.to_string()).collect(),
+            match self.flags {
+                Some(f) => f.split(',').map(|s| s.to_string()).collect(),
+                None => Vec::new(),
+            },
             match self.img_url {
                 Some(url) => Some(Url::new(url).unwrap()),
                 None => None,
