@@ -194,6 +194,31 @@ impl Sender<queries::LoginQuery> for Mediator {
         })
     }
 }
+impl Sender<queries::GetCustomerByCcQuery> for Mediator {
+    fn get_input_handler(
+        &self,
+    ) -> Arc<dyn InputHandler<queries::GetCustomerByCcQuery> + Send + Sync> {
+        Arc::new(queries::GetCustomerByCcQueryHandler {
+            customer_repository: RESOLVER.resolve(),
+        })
+    }
+}
+impl Sender<queries::GetProductBySkuQuery> for Mediator {
+    fn get_input_handler(
+        &self,
+    ) -> Arc<dyn InputHandler<queries::GetProductBySkuQuery> + Send + Sync> {
+        Arc::new(queries::GetProductsBySkuQueryHandler {
+            product_repository: RESOLVER.resolve(),
+        })
+    }
+}
+impl Sender<queries::GetSaleByIdQuery> for Mediator {
+    fn get_input_handler(&self) -> Arc<dyn InputHandler<queries::GetSaleByIdQuery> + Send + Sync> {
+        Arc::new(queries::GetSaleByIdQueryHandler {
+            sale_repository: RESOLVER.resolve(),
+        })
+    }
+}
 
 pub async fn init() {
     POOL_DB.init().await;

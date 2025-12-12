@@ -4,6 +4,7 @@ use crate::shared::{Pagination, PaginationResult, SharedError};
 
 #[async_trait::async_trait]
 pub trait SaleRepository {
+    async fn get_by_id(&self, id: &u32) -> Option<Sale>;
     async fn create(
         &self,
         customer: &Customer,

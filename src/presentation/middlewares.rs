@@ -19,12 +19,13 @@ pub async fn loggin_middleware(
 ) -> Result<ServiceResponse<impl MessageBody>, Error> {
     let method = req.method().to_string();
     let path = req.path().to_string();
+    let url = req.uri().to_string();
     let logger: Arc<dyn crate::application::services::Logger + Send + Sync> = req
         .app_data::<Data<Arc<DependenciesResolver>>>()
         .map(|d| d.as_ref())
         .unwrap()
         .resolve();
-    logger.debug(format!("method: {}, path: {}", method, path).as_str());
+    logger.debug(format!("method: {}, path: {}, url: {}", method, path, url).as_str());
     let result = next.call(req).await;
     if let Ok(r) = &result {
         logger.debug(

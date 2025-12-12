@@ -63,6 +63,83 @@ impl MySqlSaleRepository {
 
 #[async_trait::async_trait]
 impl SaleRepository for MySqlSaleRepository {
+    async fn get_by_id(&self, id: &u32) -> Option<Sale> {
+        let sale_model =
+            match sqlx::query_as::<_, SaleModel>("SELECT * FROM sales WHERE id = ? LIMIT 1")
+                .bind(id)
+                .fetch_one(self.pool.as_ref())
+                .await
+            {
+                Ok(sale) => sale,
+                Err(e) => {
+                    self.logger
+                        .error(format!("Failed to fetch sale by id {}: {}", id, e).as_str());
+                    return None;
+                }
+            };
+        let customer = match self
+            .customer_repository
+            .get_by_cc(&CC::new(sale_model.customer_cc.clone()).unwrap())
+            .await
+        {
+            Some(cust) => cust,
+            None => {
+                self.logger.error(
+                    format!(
+                        "Customer with CC {} not found for sale {}",
+                        sale_model.customer_cc, sale_model.id
+                    )
+                    .as_str(),
+                );
+                return None;
+            }
+        };
+        let sales_products = match sqlx::query_as::<_, SaleProductModel>(
+            "SELECT * FROM sale_product WHERE sale_id = ?",
+        )
+        .bind(sale_model.id)
+        .fetch_all(self.pool.as_ref())
+        .await
+        {
+            Ok(sales_products) => sales_products,
+            Err(e) => {
+                self.logger.error(
+                    format!(
+                        "Failed to fetch sale products for sale {}: {}",
+                        sale_model.id, e
+                    )
+                    .as_str(),
+                );
+                return None;
+            }
+        };
+        let mut products_sale: Vec<(Product, u32)> = Vec::new();
+        for sp in sales_products.iter() {
+            match self.product_repository.get_by_sku(&sp.product_sku).await {
+                Some(prod) => {
+                    products_sale.push((prod, sp.quantity));
+                }
+                None => {
+                    self.logger.error(
+                        format!(
+                            "Product with SKU {} not found for sale {}",
+                            sp.product_sku, sale_model.id
+                        )
+                        .as_str(),
+                    );
+                    continue;
+                }
+            }
+        }
+        Some(
+            (
+                sale_model,
+                customer,
+                products_sale.iter().map(|(p, q)| (p, *q)).collect(),
+            )
+                .into(),
+        )
+    }
     async fn create(
         &self,
         customer: &Customer,
