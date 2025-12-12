@@ -60,14 +60,102 @@ INSERT INTO sales (customer_cc) VALUES
 ('3344556677');
 
 -- sale_id and product_sku must exist in sales and products table respectively
-INSERT INTO sale_product (sale_id, product_sku, quantity) VALUES
-(1, 'TSHIRT-XD', 2),
-(1, 'MUG-001', 1),
-(2, 'HOODIE-001', 1),
-(2, 'CAP-001', 3),
-(3, 'BAG-001', 1),
-(3, 'NOTEBOOK-001', 2),
-(4, 'PEN-001', 5),
-(4, 'STICKER-001', 10),
-(5, 'JACKET-001', 1),
-(5, 'SNEAKERS-001', 1);
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 2
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '1234567890' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'TSHIRT-XD'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 1
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '1234567890' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'MUG-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 1
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '0987654321' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'HOODIE-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 3
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '0987654321' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'CAP-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 1
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '1122334455' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'BAG-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 2
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '1122334455' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'NOTEBOOK-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 5
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '2233445566' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'PEN-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 10
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '2233445566' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'STICKER-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 1
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '3344556677' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'JACKET-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
+
+INSERT INTO sale_product (sale_id, product_sku, quantity)
+SELECT sq.id, p.sku, 1
+FROM (
+  SELECT id FROM sales WHERE customer_cc = '3344556677' ORDER BY id DESC LIMIT 1
+) AS sq
+JOIN products p ON p.sku = 'SNEAKERS-001'
+WHERE NOT EXISTS (
+  SELECT 1 FROM sale_product sp WHERE sp.sale_id = sq.id AND sp.product_sku = p.sku
+);
